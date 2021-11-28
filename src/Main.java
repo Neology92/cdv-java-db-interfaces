@@ -24,25 +24,13 @@ public class Main {
         Properties props = new Properties();
         props.put("user", user);
         props.put("password", password);
+
         try {
             conn = JDBCService.connect("jdbc:oracle:thin:@" + ip + "/" + dbname, props);
 
+            int modifiedCount = JDBCService.changeSalary(conn, 100, 500);
+            System.out.println(modifiedCount + " records udpated");
 
-            String sqlText = "SELECT id_prac, nazwisko, placa_pod FROM pracownicy ORDER BY nazwisko";
-            Statement statement = conn.createStatement();
-            ResultSet rs = JDBCService.executeQuery(statement, sqlText);
-
-            while (rs.next()) {
-                String id_prac = rs.getString("id_prac");
-                String nazwisko = rs.getString("nazwisko");
-                String placa_pod = rs.getString("placa_pod");
-
-                System.out.println(id_prac + ", " + nazwisko + ", " + placa_pod);
-            }
-
-            rs = null;
-            sqlText = null;
-            statement.close();
             JDBCService.disconnect(conn);
 
         } catch (SQLException ex) {

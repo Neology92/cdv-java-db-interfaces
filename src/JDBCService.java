@@ -27,10 +27,14 @@ public class JDBCService {
     }
 
 
-//    public static int changeSalary(Connection conn, long employeeId, double newSalary) throws SQLException {
-//        String sql = "UPDATE pracownicy" +
-//                "SET placa_pod = ?" +
-//                "WHERE id_"
-//        PreparedStatement statement = conn.prepareStatement()
-//    }
+    public static int changeSalary(Connection conn, long employeeId, double newSalary) throws SQLException {
+        String sql = "UPDATE pracownicy" +
+                " SET placa_pod = ?" +
+                " WHERE id_prac = ?";
+
+        PreparedStatement statement = conn.prepareStatement(sql);
+        statement.setDouble(1, newSalary);
+        statement.setLong(2, employeeId);
+        return statement.executeUpdate();
+    }
 }
