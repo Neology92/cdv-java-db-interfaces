@@ -26,6 +26,24 @@ public class JDBCService {
         return statement.executeQuery(sql);
     }
 
+    public static void showEmployees(Connection conn) throws SQLException {
+        String sqlText = "SELECT id_prac, nazwisko, placa_pod FROM pracownicy ORDER BY nazwisko";
+        Statement statement = conn.createStatement();
+        ResultSet rs = executeQuery(statement, sqlText);
+
+        while (rs.next()) {
+            String id_prac = rs.getString("id_prac");
+            String nazwisko = rs.getString("nazwisko");
+            String placa_pod = rs.getString("placa_pod");
+
+            System.out.println(id_prac + ", " + nazwisko + ", " + placa_pod);
+        }
+
+        rs = null;
+        sqlText = null;
+        statement.close();
+    }
+
 
     public static int changeSalary(Connection conn, long employeeId, double newSalary) throws SQLException {
         String sql = "UPDATE pracownicy" +

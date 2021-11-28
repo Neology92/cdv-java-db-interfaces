@@ -26,10 +26,19 @@ public class Main {
         props.put("password", password);
 
         try {
+            int modifiedCount = 0;
             conn = JDBCService.connect("jdbc:oracle:thin:@" + ip + "/" + dbname, props);
 
-            int modifiedCount = JDBCService.changeSalary(conn, 100, 500);
+            JDBCService.showEmployees(conn);
+
+            System.out.println("");
+            modifiedCount = JDBCService.changeSalary(conn, 120, 4000);
             System.out.println(modifiedCount + " records udpated");
+
+            modifiedCount = JDBCService.changeSalary(conn, 170, 3000);
+            System.out.println(modifiedCount + " records udpated\n");
+
+            JDBCService.showEmployees(conn);
 
             JDBCService.disconnect(conn);
 
@@ -39,3 +48,4 @@ public class Main {
         }
     }
 }
+
