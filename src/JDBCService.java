@@ -5,6 +5,7 @@ public class JDBCService {
     public JDBCService() {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
+            Class.forName("org.relique.jdbc.csv.CsvDriver");
         } catch (ClassNotFoundException ex) {
             System.out.println("Unable to load the class. Terminating the program");
             System.exit(-1);
@@ -13,7 +14,7 @@ public class JDBCService {
 
     public static Connection connect(String url, Properties properties) throws SQLException {
         Connection connection = DriverManager.getConnection(url, properties);
-        System.out.println("Connection established");
+        System.out.println("Connection ( " + url + " ) established");
         return connection;
     }
 
@@ -27,9 +28,7 @@ public class JDBCService {
     }
 
     public static void showEmployees(Connection conn) throws SQLException {
-        String sqlText = "SELECT id_prac, nazwisko, placa_pod FROM pracownicy ORDER BY nazwisko";
-        Statement statement = conn.createStatement();
-        ResultSet rs = executeQuery(statement, sqlText);
+        ResultSet rs = getEmployees(conn);
 
         while (rs.next()) {
             String id_prac = rs.getString("id_prac");
@@ -40,8 +39,6 @@ public class JDBCService {
         }
 
         rs = null;
-        sqlText = null;
-        statement.close();
     }
 
 
@@ -94,5 +91,40 @@ public class JDBCService {
         statement.setDouble(1, newSalary);
         statement.setLong(2, employeeId);
         return statement.executeUpdate();
+    }
+
+    public static int copyData (Connection dbConn, Connection fileConn) throws SQLException {
+        ResultSet csvRs = getEmployees(fileConn);
+
+        String insertQuery = "INSERT INTO pracownicy (id_prac, imie, nazwisko, placa_pod) VALUES (?, ?, ?, ?)";
+        dbConn.setAutoCommit(false);
+        PreparedStatement insertPs = dbConn.prepareStatement(insertQuery);
+
+        while (csvRs.next()) {
+            int id_prac = csvRs.getInt("id");
+            String nazwisko = csvRs.getString("nazwisko");
+            String imie = csvRs.getString("imie");
+            double placa_pod = csvRs.getDouble("placa");
+
+            System.out.println("Row: " + id_prac + ", " + nazwisko + ", " + placa_pod);
+
+            insertPs.setInt(1, id_prac);
+            insertPs.setString(2, imie);
+            insertPs.setString(3, nazwisko);
+            insertPs.setDouble(4, placa_pod);
+            insertPs.addBatch();
+            System.out.println("Record added to batch!");
+        }
+        int[] counts = insertPs.executeBatch();
+        dbConn.commit();
+        dbConn.setAutoCommit(true);
+
+        return counts.length;
+    }
+
+    private static ResultSet getEmployees(Connection conn) throws SQLException {
+        String sqlText = "SELECT * FROM pracownicy ORDER BY nazwisko";
+        Statement statement = conn.createStatement();
+        return executeQuery(statement, sqlText);
     }
 }

@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
@@ -20,30 +21,20 @@ public class Main {
         String ip = config.getProperty("ip");
         // - - - - -
 
-        Connection conn = null;
 
         Properties props = new Properties();
         props.put("user", user);
         props.put("password", password);
 
         try {
-            int modifiedCount = 0;
-            conn = JDBCService.connect("jdbc:oracle:thin:@" + ip + "/" + dbname, props);
+            Connection dbConn = JDBCService.connect("jdbc:oracle:thin:@" + ip + "/" + dbname, props);
+            Connection fileConn = JDBCService.connect("jdbc:relique:csv:data", new Properties());
 
-//            JDBCService.showEmployees(conn);
-//
-//            System.out.println("");
-//            modifiedCount = JDBCService.changeSalary(conn, 120, 4000);
-//            System.out.println(modifiedCount + " records udpated");
-//
-//            modifiedCount = JDBCService.changeSalary(conn, 170, 3000);
-//            System.out.println(modifiedCount + " records udpated\n");
-//
-//            JDBCService.showEmployees(conn);
+            int count = JDBCService.copyData(dbConn, fileConn);
+            System.out.println(count);
 
-            JDBCService.showEmployeesBetween(conn, 5, 10);
-
-            JDBCService.disconnect(conn);
+            JDBCService.disconnect(dbConn);
+            JDBCService.disconnect(fileConn);
 
         } catch (SQLException ex) {
             System.out.println("Error: " + ex.getMessage());
