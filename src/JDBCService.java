@@ -45,6 +45,46 @@ public class JDBCService {
     }
 
 
+    public static void showEmployeesBetween(Connection conn, int startPosition, int endPosition) throws SQLException {
+        if(endPosition >= startPosition) {
+            String sqlText = """
+                SELECT
+                    nazwisko, placa_pod, placa_rank
+                FROM (
+                    SELECT
+                        nazwisko,
+                        placa_pod,
+                        rank() OVER ( ORDER BY placa_pod DESC ) AS placa_rank
+                    FROM pracownicy
+                )
+                WHERE placa_rank >= ? AND placa_rank <= ?
+            """;
+
+            PreparedStatement statement = conn.prepareStatement(sqlText);
+            statement.setInt(1, startPosition);
+            statement.setInt(2, endPosition);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                String nazwisko = rs.getString("nazwisko");
+                String placaPod = rs.getString("placa_pod");
+                String rankPosition =   rs.getString("placa_rank");
+
+                System.out.println(rankPosition + ": " + nazwisko + ", " + placaPod);
+            }
+
+            rs = null;
+            sqlText = null;
+            statement.close();
+        } else {
+            System.out.println("Error: Incorrect range!");
+            return;
+        }
+    }
+
+
+
+
     public static int changeSalary(Connection conn, long employeeId, double newSalary) throws SQLException {
         String sql = "UPDATE pracownicy" +
                 " SET placa_pod = ?" +

@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
@@ -29,16 +30,18 @@ public class Main {
             int modifiedCount = 0;
             conn = JDBCService.connect("jdbc:oracle:thin:@" + ip + "/" + dbname, props);
 
-            JDBCService.showEmployees(conn);
+//            JDBCService.showEmployees(conn);
+//
+//            System.out.println("");
+//            modifiedCount = JDBCService.changeSalary(conn, 120, 4000);
+//            System.out.println(modifiedCount + " records udpated");
+//
+//            modifiedCount = JDBCService.changeSalary(conn, 170, 3000);
+//            System.out.println(modifiedCount + " records udpated\n");
+//
+//            JDBCService.showEmployees(conn);
 
-            System.out.println("");
-            modifiedCount = JDBCService.changeSalary(conn, 120, 4000);
-            System.out.println(modifiedCount + " records udpated");
-
-            modifiedCount = JDBCService.changeSalary(conn, 170, 3000);
-            System.out.println(modifiedCount + " records udpated\n");
-
-            JDBCService.showEmployees(conn);
+            JDBCService.showEmployeesBetween(conn, 5, 10);
 
             JDBCService.disconnect(conn);
 
